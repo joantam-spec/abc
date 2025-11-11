@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hydrogen Bond Animation</title>
+    <!-- Load Tailwind CSS for easy centering and styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Use Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Animation container */
+        .animation-container {
+            position: relative;
+            width: 600px;
+            height: 400px;
+            max-width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        /* Atom base style */
+        .atom {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Oxygen atom */
+        .oxygen {
+            width: 80px;
+            height: 80px;
+            background-color: #ef4444; /* red-600 */
+            z-index: 10;
+        }
+
+        /* Hydrogen atom */
+        .hydrogen {
+            width: 50px;
+            height: 50px;
+            background-color: #d1d5db; /* gray-300 */
+            color: #374151; /* gray-700 */
+            z-index: 10;
+        }
+
+        /* Partial charge label */
+        .charge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #374151;
+            font-family: 'Times New Roman', Times, serif;
+            z-index: 20;
+        }
+
+        .hydrogen .charge {
+            top: -12px;
+            right: -12px;
+        }
+
+        /* Bond base style */
+        .bond {
+            position: absolute;
+            background-color: #374151; /* gray-700 */
+            transform-origin: left center;
+            z-index: 5;
+        }
+
+        /* Covalent bond */
+        .covalent {
+            height: 6px;
+            border-radius: 3px;
+        }
+
+        /* Hydrogen bond (dotted line) */
+        .hydrogen-bond {
+            width: 120px;
+            height: 4px;
+            background-image: linear-gradient(to right, #0ea5e9 /* sky-500 */ 70%, transparent 30%);
+            background-size: 15px 4px;
+            background-repeat: repeat-x;
+            border: none;
+            z-index: 1;
+            
+            /* Animation: Fade in */
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1.5s forwards;
+        }
+        
+        /* --- Molecule 1 --- */
+        #mol1-o { top: 150px; left: 100px; }
+        #mol1-h1 { top: 90px; left: 160px; }
+        #mol1-h2 { top: 210px; left: 160px; }
+
+        /* Covalent bonds for molecule 1 */
+        #mol1-b1 {
+            width: 60px;
+            top: 132px;
+            left: 155px;
+            transform: rotate(-45deg);
+        }
+        #mol1-b2 {
+            width: 60px;
+            top: 198px;
+            left: 155px;
+            transform: rotate(45deg);
+        }
+
+        /* --- Molecule 2 (The moving one) --- */
+        #molecule2 {
+            position: absolute;
+            /* Start position */
+            left: 450px;
+            top: 150px;
+            /* Animation: Move into place */
+            animation: moveIn 2s ease-in-out forwards;
+        }
+        
+        #mol2-o { top: 0px; left: 100px; }
+        #mol2-h1 { top: -60px; left: 160px; }
+        #mol2-h2 { top: 60px; left: 160px; }
+
+        /* Covalent bonds for molecule 2 */
+        #mol2-b1 {
+            width: 60px;
+            top: -18px;
+            left: 155px;
+            transform: rotate(-45deg);
+        }
+        #mol2-b2 {
+            width: 60px;
+            top: 48px;
+            left: 155px;
+            transform: rotate(45deg);
+        }
+
+        /* --- The Hydrogen Bond --- */
+        #h-bond {
+            top: 175px;
+            left: 235px; /* Between mol1-h2 and mol2-o */
+            transform-origin: left center;
+        }
+        
+        /* --- Text Labels --- */
+        .label {
+            position: absolute;
+            font-size: 0.875rem;
+            color: #374151;
+            z-index: 20;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.7);
+        }
+        
+        #label-h-bond {
+            top: 185px;
+            left: 260px;
+            color: #0ea5e9;
+            font-weight: 500;
+            opacity: 0;
+            animation: fadeIn 1s ease-out 1.5s forwards;
+        }
+
+        #label-covalent {
+            top: 90px;
+            left: 190px;
+            transform: rotate(-45deg);
+        }
+
+        /* --- Keyframe Animations --- */
+        
+        /* Molecule 2 moves left */
+        @keyframes moveIn {
+            from { left: 450px; }
+            to { left: 250px; }
+        }
+
+        /* Bond and labels fade in */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Gentle jiggle for all atoms */
+        .atom {
+            animation: jiggle 3s infinite ease-in-out alternate;
+        }
+        
+        /* Stagger the jiggle */
+        #mol1-h1, #mol2-h1 { animation-delay: 0.2s; }
+        #mol1-h2, #mol2-h2 { animation-delay: 0.4s; }
+        
+        @keyframes jiggle {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(1px, -1px); }
+            50% { transform: translate(-1px, 1px); }
+            75% { transform: translate(-1px, -1px); }
+            100% { transform: translate(1px, 1px); }
+        }
+
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    
+    <div class="w-full max-w-3xl bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold text-center text-gray-800 mb-4">
+            Animation: Hydrogen Bond Formation
+        </h1>
+        <p class="text-center text-gray-600 mb-6">
+            This animation shows two water (H₂O) molecules. The <span class="text-red-600 font-semibold">red</span> atom is Oxygen, and the <span class="text-gray-500 font-semibold">gray</span> atoms are Hydrogen.
+            The attraction between the partially positive Hydrogen (δ+) of one molecule and the partially negative Oxygen (δ-) of another forms the hydrogen bond.
+        </p>
+        
+        <!-- Main Animation Canvas -->
+        <div class="animation-container mx-auto">
+            
+            <!-- Molecule 1 (Static) -->
+            <div id="molecule1">
+                <div id="mol1-o" class="atom oxygen">
+                    <span>O</span>
+                    <span class="charge">δ-</span>
+                </div>
+                <div id="mol1-h1" class="atom hydrogen">
+                    <span>H</span>
+                    <span class="charge">δ+</span>
+                </div>
+                <div id="mol1-h2" class="atom hydrogen">
+                    <span>H</span>
+                    <span class="charge">δ+</span>
+                </div>
+                <!-- Covalent bonds -->
+                <div id="mol1-b1" class="bond covalent"></div>
+                <div id="mol1-b2" class="bond covalent"></div>
+            </div>
+
+            <!-- Molecule 2 (Moving) -->
+            <div id="molecule2">
+                <div id="mol2-o" class="atom oxygen">
+                    <span>O</span>
+                    <span class="charge">δ-</span>
+                </div>
+                <div id="mol2-h1" class="atom hydrogen">
+                    <span>H</span>
+                    <span class="charge">δ+</span>
+                </div>
+                <div id="mol2-h2" class="atom hydrogen">
+                    <span>H</span>
+                    <span class="charge">δ+</span>
+                </div>
+                <!-- Covalent bonds -->
+                <div id="mol2-b1" class="bond covalent"></div>
+                <div id="mol2-b2" class="bond covalent"></div>
+            </div>
+
+            <!-- The Hydrogen Bond -->
+            <div id="h-bond" class="bond hydrogen-bond"></div>
+
+            <!-- Labels -->
+            <div id="label-h-bond" class="label">Hydrogen Bond</div>
+            <div id="label-covalent" class="label">Covalent Bond</div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
